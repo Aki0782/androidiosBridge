@@ -19,7 +19,7 @@ const  receiveJsonFromAndroid = (event: MessageEvent) => {
   setdata(jsonData)
 }
 useEffect(() => {
-  window.addEventListener('message', (e) => receiveJsonFromAndroid(e));
+  window.addEventListener('receiveMessageFromNative', receiveJsonFromAndroid as EventListener);
 }, [])
   return (  
     <div>
@@ -56,7 +56,7 @@ export default App;
 //         Log.d("Received JSON", jsonData)
 
 //         // Pass the JSON data back to the WebView
-//         webView.post { webView.evaluateJavascript("window.dispatchEvent(new MessageEvent('message', { data: $jsonData }));", null) }
+//         webView.post { webView.evaluateJavascript("window.dispatchEvent(new MessageEvent('receiveMessageFromNative', { data: $jsonData }));", null) }
 //     }
 // }
 
@@ -101,7 +101,7 @@ export default App;
 //             let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
 //             let jsonString = String(data: jsonData, encoding: .utf8)!
             
-//             let javascriptCode = "window.dispatchEvent(new MessageEvent('message', { data: '\(jsonString)' }));"
+//             let javascriptCode = "window.dispatchEvent(new MessageEvent('receiveMessageFromNative', { data: '\(jsonString)' }));"
 //             webView.evaluateJavaScript(javascriptCode, completionHandler: nil)
 //         } catch {
 //             print("Error converting data to JSON: \(error)")
