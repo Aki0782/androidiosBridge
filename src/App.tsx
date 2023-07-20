@@ -40,7 +40,7 @@ export default App;
 //     key2: 'value2',
 //   };
 
-//   const messageEvent = new MessageEvent('message', {
+//   const messageEvent = new MessageEvent('receiveMessageFromNative', {
 //     data: JSON.stringify(testData),
 //   });
 //   window.dispatchEvent(messageEvent);
