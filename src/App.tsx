@@ -1,82 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { receiveJsonFromNative, sendDataToAndroid, sendDataToIOS } from "./util/nativeBridge";
 
 const App: React.FC = () => {
-	const [data, setdata] = useState<any>(null);
-	//   const sendJsonToAndroid =() =>  {
-	//     const data = {
-	//       message: "Data from React"
-	//     }
-	//   const jsonData = JSON.stringify(data);
-	//   window.postMessage(jsonData);
-	// }
-
-	// Function to receive JSON data from Android
-
-	const receiveJsonFromAndroid = (event: MessageEvent) => {
-		const jsonData = event.data;
-		// const data = JSON.parse(jsonData);
-		console.log("Received JSON:", jsonData);
-		setdata(jsonData);
-	};
-
-  // Send to Android
-
-	const sendDataToAndroid = (jsonData: { name: string }): void => {
-		if (typeof window.AndroidInterface !== "undefined") {
-			window.AndroidInterface.sendDataToAndroid(JSON.stringify(jsonData));
-		}
-	};
-
-  // Button Handler for Android
-
-	const handleButtonAndroidClick = (): void => {
-		const jsonData: {
-			name: string;
-		} = {
-			name: "Toggle",
-		};
-
-		sendDataToAndroid(jsonData);
-	};
-
-  // Button Handler for IOS
-
-	const handlerIOSClick = (): void => {
-		sendJSONDataToiOS({
-			name: "Toggle",
-		});
-	};
-
-  // Send to IOS
-
-	const sendJSONDataToiOS = (jsonData: { name: string }): void => {
-		if (
-			window.webkit !== undefined &&
-			window.webkit.messageHandlers.sendToIOS !== undefined
-		) {
-			window.webkit.messageHandlers.sendToIOS.postMessage(jsonData);
-		} else {
-			const err =
-				window.webkit && window.webkit.messageHandlers.sendToIOS === undefined
-					? "Handler not found"
-					: "IOS webkit not found";
-
-			console.log(err);
-		}
-	};
+	const [data, setdata] = useState<object | null>(null);
 
 	useEffect(() => {
-		window.addEventListener(
-			"receiveMessageFromNative",
-			receiveJsonFromAndroid as EventListener
-		);
-	}, []);
+  const eventListener = (e: MessageEvent) => {
+    receiveJsonFromNative(e, setdata);
+  };
+
+  window.addEventListener("receiveMessageFromNative", eventListener as EventListener);
+
+  // Clean up the event listener on component unmount
+  return () => {
+    window.removeEventListener("receiveMessageFromNative", eventListener as EventListener);
+  };
+}, []);
 	return (
 		<div>
-			<button onClick={() => handleButtonAndroidClick()}>
+			<button onClick={() => sendDataToAndroid({name: "Hello from React"})}>
 				send data to Android
 			</button>
-			<button onClick={() => handlerIOSClick()}>send data to IOS</button>
+			<button onClick={() => sendDataToIOS({name: "Hello from React"})}>send data to IOS</button>
 
 			<h1>Receive Data: {JSON.stringify(data)}</h1>
 		</div>
